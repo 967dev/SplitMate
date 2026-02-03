@@ -8,7 +8,7 @@ const payments = [];
 
 // Хранилище (localStorage)
 const STORAGE_KEY = "splitmate_state_v1";
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwyhmUD7lqoFPt7fMKpgxtm0e-0U8pjNmUevm_0Pfug2rq8PiQoMKXJTIR-Jk94HnwG/exec";
+const GAS_URL = "__GAS_URL__";
 
 let globalState = {
   groups: {},
@@ -675,23 +675,47 @@ welcomeForm.addEventListener("submit", async (e) => {
 const inviteBtn = document.getElementById("invite-btn");
 if (inviteBtn) {
   inviteBtn.addEventListener("click", () => {
-    if (!currentGroupCode) return;
+    if (!currentGroupCode) {
+      showToast("Сначала войдите в группу", "error");
+      return;
+    }
 
-    // Если мы в Telegram, генерируем ссылку startapp
-    // Пользователю нужно будет заменить BOT_USERNAME на своего бота
     const botUsername = "spl1tmate_bot"; // Важно: замените на юзернейм вашего бота (без @)
     const joinLink = `https://t.me/${botUsername}/app?startapp=${currentGroupCode}`;
-
-    // Если нет бота, просто копируем код
     const text = `Заходи в SplitMate для разделения чеков!\nГруппа: ${currentGroupCode}\n\n${joinLink}`;
 
-    if (tg && tg.onEvent) {
-      tg.switchInlineQuery(currentGroupCode, ["users", "groups", "channels"]);
-      showToast("Используй поиск, чтобы отправить код группы друзьям", "success");
-    } else {
+    // Функция для копирования с уведомлением
+    const copyWithToast = () => {
       navigator.clipboard.writeText(text).then(() => {
-        showToast("Ссылка и код скопированы!", "success");
+        showToast("Код и ссылка скопированы!", "success");
+      }).catch(err => {
+        console.error('Ошибка копирования:', err);
+        showToast("Не удалось скопировать. Попробуйте вручную.", "error");
       });
+    };
+
+    // Если мы в Telegram Mini App
+    if (tg && tg.initData && tg.initData.length > 0) {
+      // 1. Копируем в буфер (чтобы юзер мог вставить куда угодно)
+      navigator.clipboard.writeText(text);
+
+      // 2. Открываем нативное меню "Поделиться" в Telegram
+      const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(joinLink)}&text=${encodeURIComponent(text)}`;
+      try {
+        tg.openTelegramLink(shareUrl);
+        showToast("Код скопирован. Выберите чат.", "success");
+      } catch (e) {
+        copyWithToast();
+      }
+    } else if (navigator.share) {
+      // Если браузер поддерживает системный "Поделиться"
+      navigator.share({
+        title: 'Приглашение в SplitMate',
+        text: text,
+        url: joinLink
+      }).catch(() => copyWithToast());
+    } else {
+      copyWithToast();
     }
   });
 }
