@@ -25,24 +25,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Replace GAS_URL Placeholder
-        env:
-          REAL_GAS_URL: ${{ secrets.GAS_URL }}
-        run: |
-          if [ -z "$REAL_GAS_URL" ]; then
-            echo "::error::Secret GAS_URL is EMPTY or NOT FOUND!"
-            exit 1
-          fi
-          # Используем @ как разделитель, так как в URL его обычно нет
-          sed -i "s@__GAS_URL__@$REAL_GAS_URL@g" app.js
-          
-          # Проверка: если слово __GAS_URL__ все еще в файле, значит замена не сработала
-          if grep -q "__GAS_URL__" app.js; then
-            echo "::error::Replacement FAILED! Placeholder still exists."
-            exit 1
-          fi
-          echo "GAS_URL replaced successfully."
-
       - name: Setup Pages
         uses: actions/configure-pages@v4
 

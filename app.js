@@ -8,7 +8,7 @@ const payments = [];
 
 // Хранилище (localStorage)
 const STORAGE_KEY = "splitmate_state_v1";
-const GAS_URL = "__GAS_URL__";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwyhmUD7lqoFPt7fMKpgxtm0e-0U8pjNmUevm_0Pfug2rq8PiQoMKXJTIR-Jk94HnwG/exec";
 
 let globalState = {
   groups: {},
