@@ -149,7 +149,7 @@ function saveCurrentGroupToState() {
 }
 
 async function syncWithBackend() {
-  if (!currentGroupCode || !GAS_URL) return;
+  if (!currentGroupCode || !GAS_URL || GAS_URL === "__GAS_URL__") return;
   try {
     const stateToSend = globalState.groups[currentGroupCode];
     await fetch(GAS_URL, {
@@ -167,7 +167,7 @@ async function syncWithBackend() {
 }
 
 async function loadFromBackend(groupCode) {
-  if (!GAS_URL) return;
+  if (!GAS_URL || GAS_URL === "__GAS_URL__") return;
   try {
     const resp = await fetch(`${GAS_URL}?groupCode=${encodeURIComponent(groupCode)}`);
     const json = await resp.json();
