@@ -628,13 +628,16 @@ welcomeForm.addEventListener("submit", async (e) => {
   let group = welcomeGroupInput.value.trim();
   if (!group) return;
 
-  // Telegram deep links (startapp) поддерживают только a-z, A-Z, 0-9, _ и -
-  // Автоматически заменяем пробелы на подчеркивания и убираем спецсимволы
-  const sanitizedGroup = group.replace(/[^a-zA-Z0-9_-]/g, '_');
-  if (group !== sanitizedGroup) {
-    showToast("Название группы изменено для совместимости", "info");
-    group = sanitizedGroup;
-    welcomeGroupInput.value = group;
+  // Telegram СТРОГО требует для start_param только латиницу, цифры, _ и -
+  // Любые другие символы (включая кириллицу) вызовут START_PARAM_INVALID
+  const isValid = /^[a-zA-Z0-9_-]+$/.test(group);
+
+  if (!isValid) {
+    showToast("Ошибка: Код группы должен быть на английском (A-Z, 0-9)", "error");
+    // Пытаемся автоматически "починить" для удобства
+    const fixed = group.replace(/[^a-zA-Z0-9_-]/g, '_');
+    welcomeGroupInput.value = fixed;
+    return; // Даем пользователю увидеть исправленный код и нажать еще раз
   }
 
   // Имя берем из Telegram или из инпута (если остался для теста)

@@ -471,6 +471,7 @@ body.tg-light .list-item.clickable:hover {
   align-items: center;
   justify-content: space-between;
   gap: 6px;
+  flex-wrap: wrap;
 }
 
 .card-badge {
