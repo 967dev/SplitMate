@@ -625,8 +625,17 @@ function renderCurrentUserBalance(existingBalancesCents) {
 // Экран 1: вход / группа
 welcomeForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const group = welcomeGroupInput.value.trim();
+  let group = welcomeGroupInput.value.trim();
   if (!group) return;
+
+  // Telegram deep links (startapp) поддерживают только a-z, A-Z, 0-9, _ и -
+  // Автоматически заменяем пробелы на подчеркивания и убираем спецсимволы
+  const sanitizedGroup = group.replace(/[^a-zA-Z0-9_-]/g, '_');
+  if (group !== sanitizedGroup) {
+    showToast("Название группы изменено для совместимости", "info");
+    group = sanitizedGroup;
+    welcomeGroupInput.value = group;
+  }
 
   // Имя берем из Telegram или из инпута (если остался для теста)
   let name = "Гость";
@@ -721,12 +730,9 @@ if (inviteBtn) {
       return;
     }
 
-    let botUsername = "spl1tmate_bot"; // Без @
-    botUsername = botUsername.replace("@", "");
-
-    // Используем универсальный формат ссылки, который работает всегда, 
-    // даже если Mini App не настроен как 'app'
-    const joinLink = `https://t.me/${botUsername}?startapp=${currentGroupCode}`;
+    // Самый надежный формат для Mini App: /app?startapp=
+    // Если в BotFather стоит имя 'app', то эта ссылка откроет приложение напрямую
+    const joinLink = `https://t.me/${botUsername}/app?startapp=${encodeURIComponent(currentGroupCode)}`;
     const text = `Заходи в SplitMate! Группа: ${currentGroupCode}\n\nПрисоединиться: ${joinLink}`;
 
     // Функция для копирования с уведомлением
