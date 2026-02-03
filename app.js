@@ -39,7 +39,6 @@ let currentUserId = null;
 let currentGroupCode = null;
 
 // Экран 2: элементы интерфейса
-const currentGroupLabel = document.getElementById("current-group-label");
 const currentGroupCodeLabel = document.getElementById("current-group-code-label");
 const currentUserNameEl = document.getElementById("current-user-name");
 const currentUserBalanceEl = document.getElementById("current-user-balance");
@@ -632,7 +631,6 @@ welcomeForm.addEventListener("submit", async (e) => {
   }
 
   currentGroupCode = group;
-  if (currentGroupLabel) currentGroupLabel.textContent = group;
   if (currentGroupCodeLabel) currentGroupCodeLabel.textContent = group;
 
   // Сначала подгружаем из облака
@@ -681,7 +679,7 @@ if (inviteBtn) {
 
     // Если мы в Telegram, генерируем ссылку startapp
     // Пользователю нужно будет заменить BOT_USERNAME на своего бота
-    const botUsername = "spl1tmate_bot"; // Можно сделать настройку или подтянуть из параметров
+    const botUsername = "spl1tmate_bot"; // Важно: замените на юзернейм вашего бота (без @)
     const joinLink = `https://t.me/${botUsername}/app?startapp=${currentGroupCode}`;
 
     // Если нет бота, просто копируем код

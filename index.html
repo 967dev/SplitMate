@@ -59,24 +59,21 @@
     <!-- Экран 2: основное приложение -->
     <div id="main-screen" class="screen screen-hidden">
       <header class="app-header app-header-main">
-        <div>
-          <h1>SplitMate</h1>
-          <p class="subtitle">
-            Группа: <span id="current-group-code-label">—</span>
-          </p>
-        </div>
-        <div class="card p-20 mb-20">
-          <div class="group-info-row">
-            <div>
-              <p class="label mb-4">Группа</p>
-              <h3 id="current-group-label" class="title-md">—</h3>
+        <div class="header-stack">
+          <h1 class="logo">SplitMate</h1>
+
+          <div class="current-user-chip">
+            <span class="small muted">Ты</span>
+            <span id="current-user-name">—</span>
+          </div>
+
+          <div class="group-card-compact">
+            <div class="group-info">
+              <p class="label small muted mb-4">Компашка</p>
+              <h3 id="current-group-code-label" class="title-md">—</h3>
             </div>
             <button id="invite-btn" class="secondary-btn small">Пригласить</button>
           </div>
-        </div>
-        <div class="current-user-chip">
-          <span class="small muted">Ты</span>
-          <span id="current-user-name">—</span>
         </div>
       </header>
 
