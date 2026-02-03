@@ -677,6 +677,41 @@ welcomeForm.addEventListener("submit", async (e) => {
   renderAll();
 });
 
+// Кнопка выхода из группы
+const leaveGroupBtn = document.getElementById("leave-group-btn");
+if (leaveGroupBtn) {
+  leaveGroupBtn.addEventListener("click", () => {
+    if (confirm("Выйти из этой группы? Код группы сохранится в списке.")) {
+      leaveGroup();
+    }
+  });
+}
+
+function leaveGroup() {
+  currentGroupCode = null;
+  currentUserId = null;
+
+  // Очищаем локальные массивы
+  participants.length = 0;
+  expenses.length = 0;
+  payments.length = 0;
+
+  // Убираем флаг последней группы, чтобы не было авто-входа
+  globalState.lastGroupCode = null;
+  persistStateToStorage();
+
+  // Переключаем экраны
+  mainScreen.classList.remove("screen-active");
+  mainScreen.classList.add("screen-hidden");
+  welcomeScreen.classList.remove("screen-hidden");
+  welcomeScreen.classList.add("screen-active");
+
+  // Сбрасываем инпут
+  if (welcomeGroupInput) welcomeGroupInput.value = "";
+
+  showToast("Вы вышли из группы", "info");
+}
+
 // Кнопка приглашения
 const inviteBtn = document.getElementById("invite-btn");
 if (inviteBtn) {
@@ -904,21 +939,29 @@ resetAllBtn.addEventListener("click", () => {
 // Стартовая отрисовка
 loadStateFromStorage();
 
-// Если уже есть последняя группа и имя — подставляем их в форму
+// Если уже есть последнее имя — подставляем в форму
 if (globalState.lastUserName) {
   welcomeNameInput.value = globalState.lastUserName;
 }
-if (globalState.lastGroupCode) {
-  welcomeGroupInput.value = globalState.lastGroupCode;
+
+// Важно: Удаляем автоматическую подстановку lastGroupCode в инпут, 
+// чтобы юзер видел пустую строку для новой группы
+if (welcomeGroupInput) {
+  welcomeGroupInput.value = "";
 }
 
 // Обработка приглашения из Telegram
 window.addEventListener("DOMContentLoaded", () => {
   if (tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
-    welcomeGroupInput.value = tg.initDataUnsafe.start_param;
-    // Можно автоматически нажать "Продолжить" если юзернейм уже известен
+    const inviteCode = tg.initDataUnsafe.start_param;
+    welcomeGroupInput.value = inviteCode;
+
+    // Автоматически входим ТОЛЬКО по ссылке-приглашению
     if (tg.initDataUnsafe.user) {
-      setTimeout(() => welcomeForm.requestSubmit(), 500);
+      setTimeout(() => {
+        showToast(`Входим в группу ${inviteCode}...`, "info");
+        welcomeForm.requestSubmit();
+      }, 500);
     }
   }
 });
