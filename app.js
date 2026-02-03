@@ -724,9 +724,10 @@ if (inviteBtn) {
     let botUsername = "spl1tmate_bot"; // Без @
     botUsername = botUsername.replace("@", "");
 
-    // Ссылка вида /app?startapp= требует, чтобы в BotFather было создано Mini App с именем 'app'
-    const joinLink = `https://t.me/${botUsername}/app?startapp=${currentGroupCode}`;
-    const text = `Заходи в SplitMate! Группа: ${currentGroupCode}\n\n${joinLink}`;
+    // Используем универсальный формат ссылки, который работает всегда, 
+    // даже если Mini App не настроен как 'app'
+    const joinLink = `https://t.me/${botUsername}?startapp=${currentGroupCode}`;
+    const text = `Заходи в SplitMate! Группа: ${currentGroupCode}\n\nПрисоединиться: ${joinLink}`;
 
     // Функция для копирования с уведомлением
     const copyWithToast = () => {
