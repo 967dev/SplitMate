@@ -740,20 +740,15 @@ if (inviteBtn) {
 
     // Если мы в Telegram Mini App
     if (tg && tg.initData && tg.initData.length > 0) {
-      // 1. Копируем в буфер (чтобы юзер мог вставить куда угодно)
+      // 1. Копируем в буфер (на всякий случай)
       navigator.clipboard.writeText(text);
 
-      // 2. Используем нативную шарилку Telegram (если поддерживается)
-      // или открываем диалог выбора чата
+      // 2. Открываем нативное меню "Поделиться" в Telegram через share/url
+      // Это самый надежный способ для Mini App
+      const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(joinLink)}&text=${encodeURIComponent(text)}`;
       try {
-        if (tg.shareToContact) {
-          tg.shareToContact(); // Это для специальных ботов, но в Mini App лучше просто ссылку
-        }
-
-        // Самый надежный способ - отправить ссылку самому себе или в чат через внешнюю ссылку
-        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(joinLink)}&text=${encodeURIComponent(text)}`;
         tg.openTelegramLink(shareUrl);
-        showToast("Выберите чат для приглашения", "success");
+        showToast("Выберите чат для отправки", "success");
       } catch (e) {
         copyWithToast();
       }
