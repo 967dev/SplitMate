@@ -40,6 +40,7 @@ let currentGroupCode = null;
 
 // Экран 2: элементы интерфейса
 const currentGroupLabel = document.getElementById("current-group-label");
+const currentGroupCodeLabel = document.getElementById("current-group-code-label");
 const currentUserNameEl = document.getElementById("current-user-name");
 const currentUserBalanceEl = document.getElementById("current-user-balance");
 const currentUserBalanceCaptionEl = document.getElementById("current-user-balance-caption");
@@ -631,7 +632,8 @@ welcomeForm.addEventListener("submit", async (e) => {
   }
 
   currentGroupCode = group;
-  currentGroupLabel.textContent = group;
+  if (currentGroupLabel) currentGroupLabel.textContent = group;
+  if (currentGroupCodeLabel) currentGroupCodeLabel.textContent = group;
 
   // Сначала подгружаем из облака
   await loadFromBackend(currentGroupCode);
