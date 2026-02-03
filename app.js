@@ -734,9 +734,7 @@ if (inviteBtn) {
       return;
     }
 
-    // Самый надежный формат для Mini App: /app?startapp=
-    // Если в BotFather стоит имя 'app', то эта ссылка откроет приложение напрямую
-    const joinLink = `https://t.me/${BOT_USERNAME}/app?startapp=${encodeURIComponent(currentGroupCode)}`;
+    const joinLink = `https://t.me/${BOT_USERNAME}?startapp=${encodeURIComponent(currentGroupCode)}`;
     const text = `Заходи в SplitMate! Группа: ${currentGroupCode}\n\nПрисоединиться: ${joinLink}`;
 
     // Функция для копирования с уведомлением
