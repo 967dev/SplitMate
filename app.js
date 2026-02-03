@@ -149,20 +149,26 @@ function saveCurrentGroupToState() {
 }
 
 async function syncWithBackend() {
-  if (!currentGroupCode || !GAS_URL || GAS_URL === "__GAS_URL__") return;
+  if (!currentGroupCode || !GAS_URL || GAS_URL === "__GAS_URL__") {
+    console.warn("Синхронизация пропущена: GAS_URL не настроен");
+    if (GAS_URL === "__GAS_URL__") {
+      showToast("Ошибка: GAS_URL не подставлен в GitHub Secrets", "error");
+    }
+    return;
+  }
   try {
     const stateToSend = globalState.groups[currentGroupCode];
     await fetch(GAS_URL, {
       method: "POST",
-      mode: "no-cors", // GAS требует no-cors для простых POST
+      mode: "no-cors",
       body: JSON.stringify({
         groupCode: currentGroupCode,
         state: stateToSend
       })
     });
-    // Мы не можем прочитать ответ в no-cors, но сохранение обычно проходит
   } catch (e) {
     console.error("Ошибка синхронизации с GAS:", e);
+    showToast("Ошибка сети при сохранении", "error");
   }
 }
 
@@ -681,8 +687,11 @@ if (inviteBtn) {
     }
 
     const botUsername = "spl1tmate_bot"; // Важно: замените на юзернейм вашего бота (без @)
-    const joinLink = `https://t.me/${botUsername}/app?startapp=${currentGroupCode}`;
-    const text = `Заходи в SplitMate для разделения чеков!\nГруппа: ${currentGroupCode}\n\n${joinLink}`;
+
+    // Формат ссылки: если нет созданного Mini App с коротким именем, 
+    // параметры startapp все равно могут передаваться через прямую ссылку на бота
+    const joinLink = `https://t.me/${botUsername}?startapp=${currentGroupCode}`;
+    const text = `Заходи в SplitMate для разделения чеков!\nГруппа: ${currentGroupCode}\n\nПрисоединиться: ${joinLink}`;
 
     // Функция для копирования с уведомлением
     const copyWithToast = () => {
@@ -699,11 +708,17 @@ if (inviteBtn) {
       // 1. Копируем в буфер (чтобы юзер мог вставить куда угодно)
       navigator.clipboard.writeText(text);
 
-      // 2. Открываем нативное меню "Поделиться" в Telegram
-      const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(joinLink)}&text=${encodeURIComponent(text)}`;
+      // 2. Используем нативную шарилку Telegram (если поддерживается)
+      // или открываем диалог выбора чата
       try {
+        if (tg.shareToContact) {
+          tg.shareToContact(); // Это для специальных ботов, но в Mini App лучше просто ссылку
+        }
+
+        // Самый надежный способ - отправить ссылку самому себе или в чат через внешнюю ссылку
+        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(joinLink)}&text=${encodeURIComponent(text)}`;
         tg.openTelegramLink(shareUrl);
-        showToast("Код скопирован. Выберите чат.", "success");
+        showToast("Выберите чат для приглашения", "success");
       } catch (e) {
         copyWithToast();
       }
