@@ -6,8 +6,9 @@ const expenses = [];
 // оплаченные переводы: { fromId, toId, amount }
 const payments = [];
 
-// Хранилище (localStorage)
+// Константы конфигурации
 const STORAGE_KEY = "splitmate_state_v1";
+const BOT_USERNAME = "spl1tmate_bot";
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwyhmUD7lqoFPt7fMKpgxtm0e-0U8pjNmUevm_0Pfug2rq8PiQoMKXJTIR-Jk94HnwG/exec";
 
 let globalState = {
@@ -735,7 +736,7 @@ if (inviteBtn) {
 
     // Самый надежный формат для Mini App: /app?startapp=
     // Если в BotFather стоит имя 'app', то эта ссылка откроет приложение напрямую
-    const joinLink = `https://t.me/${botUsername}/app?startapp=${encodeURIComponent(currentGroupCode)}`;
+    const joinLink = `https://t.me/${BOT_USERNAME}/app?startapp=${encodeURIComponent(currentGroupCode)}`;
     const text = `Заходи в SplitMate! Группа: ${currentGroupCode}\n\nПрисоединиться: ${joinLink}`;
 
     // Функция для копирования с уведомлением
