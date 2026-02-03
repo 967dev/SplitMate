@@ -1,4 +1,4 @@
-name: Deploy SplitMate to GitHub Pages
+name: Deploy SplitMate App to GitHub Pages
 
 on:
   push:
