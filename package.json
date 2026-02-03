@@ -1,0 +1,9 @@
+{
+  "name": "telegram-bill-split-mini-app",
+  "version": "0.1.0",
+  "description": "Простое веб-приложение для Telegram Mini App для расчёта долгов по общим чекам.",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}
+

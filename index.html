@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Разделение чеков — Telegram Mini App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Поддержка Telegram WebApp темы (тёмная/светлая) -->
+  <script>
+    // Если приложение запущено как Telegram WebApp, применяем цвет фона
+    window.addEventListener("DOMContentLoaded", () => {
+      if (window.Telegram && window.Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        document.body.classList.add(tg.colorScheme === "dark" ? "tg-dark" : "tg-light");
+      }
+    });
+  </script>
+</head>
+
+<body>
+  <div class="app">
+    <!-- Экран 1: вход / создание группы -->
+    <div id="welcome-screen" class="screen screen-active">
+      <header class="app-header">
+        <h1>SplitMate</h1>
+        <p class="subtitle">
+          Красиво считаем, кто сколько кому должен
+        </p>
+      </header>
+
+      <div class="card p-32">
+        <h2 class="title-lg mb-16">Войти в компанию друзей</h2>
+        <form id="welcome-form">
+          <div class="input-group mb-16" id="name-input-group">
+            <label class="label mb-8" for="welcome-name">Твоё имя</label>
+            <input type="text" id="welcome-name" class="input" placeholder="Например, Егор" />
+          </div>
+
+          <div class="input-group mb-16">
+            <label class="label mb-8" for="welcome-group">Код / название группы</label>
+            <input type="text" id="welcome-group" class="input" placeholder="Например, Тур_в_Сочи_2026" required />
+          </div>
+          <p class="muted small">
+            Придумай код и отправь друзьям — все, кто введёт его, окажутся в одной группе.
+          </p>
+          <div class="welcome-buttons">
+            <button type="submit" class="primary-btn full-width">Продолжить</button>
+          </div>
+        </form>
+        </section>
+      </div>
+
+      <!-- Экран 2: основное приложение -->
+      <div id="main-screen" class="screen screen-hidden">
+        <header class="app-header app-header-main">
+          <div>
+            <h1>SplitMate</h1>
+            <p class="subtitle">
+              Группа: <span id="current-group-label">—</span>
+            </p>
+          </div>
+          <div class="card p-20 mb-20">
+            <div class="group-info-row">
+              <div>
+                <p class="label mb-4">Группа</p>
+                <h3 id="current-group-label" class="title-md">—</h3>
+              </div>
+              <button id="invite-btn" class="secondary-btn small">Пригласить</button>
+            </div>
+          </div>
+          <div class="current-user-chip">
+            <span class="small muted">Ты</span>
+            <span id="current-user-name">—</span>
+          </div>
+        </header>
+
+        <main class="app-main">
+          <section class="card glass balance-card">
+            <div class="balance-label">Твой баланс</div>
+            <div id="current-user-balance" class="balance-value">0 ₽</div>
+            <div id="current-user-balance-caption" class="balance-caption muted small">
+              Пока нет расходов
+            </div>
+            <div class="balance-actions">
+              <button id="open-add-expense" class="primary-btn">Добавить расход</button>
+              <button id="open-payments" class="secondary-btn">Оплатить</button>
+            </div>
+          </section>
+
+          <section class="side-columns">
+            <section class="card glass">
+              <h2>Участники</h2>
+              <form id="participant-form" class="form-inline">
+                <input type="text" id="participant-name" placeholder="Имя (например, Анна)" required />
+                <button type="submit">Добавить</button>
+              </form>
+              <ul id="participants-list" class="pill-list"></ul>
+            </section>
+
+            <section class="card glass">
+              <div class="card-header-row">
+                <h2>Расходы</h2>
+                <span class="card-badge small muted">по чекам</span>
+              </div>
+
+              <form id="expense-form" class="expense-form">
+                <div class="field-row">
+                  <label for="expense-title">Описание</label>
+                  <input type="text" id="expense-title" placeholder="Кино, ресторан, продукты..." required />
+                </div>
+
+                <div class="field-row field-row-inline">
+                  <div class="field-half">
+                    <label for="expense-amount">Общая сумма чека</label>
+                    <input type="number" id="expense-amount" placeholder="Например, 1500" min="0" step="0.01"
+                      required />
+                  </div>
+                  <div class="field-half">
+                    <label for="expense-payer">Кто заплатил</label>
+                    <select id="expense-payer" required>
+                      <option value="">Добавьте участников выше</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="field-row">
+                  <label>Кто участвовал и сколько должен</label>
+                  <div id="expense-participants" class="participants-checkboxes">
+                    <p class="muted">Добавьте участников выше</p>
+                  </div>
+                  <p class="muted small">
+                    Отметьте, кто участвовал, и укажите
+                    <strong>свою сумму</strong>
+                    (сколько этот человек должен по этой трате).
+                    Сумма по людям должна совпадать с общей суммой чека.
+                  </p>
+                </div>
+
+                <div class="expense-actions-row">
+                  <button type="button" id="split-equally" class="secondary-btn small">Разделить поровну</button>
+                  <button type="submit" class="primary-btn">Добавить расход</button>
+                </div>
+              </form>
+
+              <ul id="expenses-list" class="list"></ul>
+
+              <div id="expense-details" class="expense-details muted small">
+                Нажмите на трату выше, чтобы увидеть подробности по людям.
+              </div>
+            </section>
+
+            <section class="card glass">
+              <div class="card-header-row">
+                <h2>Расчёт между всеми</h2>
+                <span class="card-badge small muted">кто кому должен</span>
+              </div>
+
+              <div class="field-row">
+                <label for="personal-view">Показать для</label>
+                <select id="personal-view">
+                  <option value="all">Всех сразу</option>
+                </select>
+              </div>
+
+              <div id="balances-summary" class="summary"></div>
+              <div id="settlements" class="settlements"></div>
+
+              <p class="muted small payments-hint">
+                В блоке «Оплатить» можно отметить переводы, которые уже совершены — они вычтутся из
+                долгов.
+              </p>
+            </section>
+            <section class="card glass">
+              <div class="card-header-row">
+                <h2>Настройки</h2>
+                <button id="reset-all" class="delete-btn small">Сбросить всё</button>
+              </div>
+              <div class="field-row">
+                <label for="currency-select">Валюта</label>
+                <select id="currency-select">
+                  <option value="₽">Рубль (₽)</option>
+                  <option value="$">Доллар ($)</option>
+                  <option value="€">Евро (€)</option>
+                  <option value="₸">Тенге (₸)</option>
+                </select>
+              </div>
+              <div class="field-row">
+                <label>Данные группы (JSON)</label>
+                <div class="expense-actions-row">
+                  <button id="export-data" class="secondary-btn small full-width">Копировать код</button>
+                  <button id="import-data" class="secondary-btn small full-width">Импорт</button>
+                </div>
+              </div>
+            </section>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+    <script src="app.js"></script>
+</body>
+
+</html>
