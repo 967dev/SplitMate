@@ -686,12 +686,12 @@ if (inviteBtn) {
       return;
     }
 
-    const botUsername = "spl1tmate_bot"; // Важно: замените на юзернейм вашего бота (без @)
+    let botUsername = "spl1tmate_bot"; // Без @
+    botUsername = botUsername.replace("@", "");
 
-    // Формат ссылки: если нет созданного Mini App с коротким именем, 
-    // параметры startapp все равно могут передаваться через прямую ссылку на бота
-    const joinLink = `https://t.me/${botUsername}?startapp=${currentGroupCode}`;
-    const text = `Заходи в SplitMate для разделения чеков!\nГруппа: ${currentGroupCode}\n\nПрисоединиться: ${joinLink}`;
+    // Ссылка вида /app?startapp= требует, чтобы в BotFather было создано Mini App с именем 'app'
+    const joinLink = `https://t.me/${botUsername}/app?startapp=${currentGroupCode}`;
+    const text = `Заходи в SplitMate! Группа: ${currentGroupCode}\n\n${joinLink}`;
 
     // Функция для копирования с уведомлением
     const copyWithToast = () => {
