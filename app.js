@@ -679,7 +679,7 @@ if (inviteBtn) {
 
     // Если мы в Telegram, генерируем ссылку startapp
     // Пользователю нужно будет заменить BOT_USERNAME на своего бота
-    const botUsername = "YOUR_BOT_USERNAME"; // Можно сделать настройку или подтянуть из параметров
+    const botUsername = "spl1tmate_bot"; // Можно сделать настройку или подтянуть из параметров
     const joinLink = `https://t.me/${botUsername}/app?startapp=${currentGroupCode}`;
 
     // Если нет бота, просто копируем код
